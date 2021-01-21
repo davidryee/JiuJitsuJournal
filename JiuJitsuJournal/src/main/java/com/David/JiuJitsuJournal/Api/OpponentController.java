@@ -11,14 +11,12 @@ import java.util.List;
 
 @RestController
 public class OpponentController {
-
     private OpponentManager opponentManager;
-//    public OpponentController(OpponentManager opponentManager){
-//        this.opponentManager = opponentManager;
-//    }
-    public OpponentController(){
-        opponentManager = new OpponentManager();
+
+    public OpponentController(OpponentManager opponentManager){
+        this.opponentManager = opponentManager;
     }
+
     @GetMapping("/opponents")
     public Iterable<com.David.JiuJitsuJournal.Api.Responses.Opponent> getOpponents() {
 
