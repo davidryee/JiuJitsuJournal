@@ -1,4 +1,4 @@
-package com.David.JiuJitsuJournal.Api.Mappers.OpponentMapper;
+package com.David.JiuJitsuJournal.Api.Mappers;
 
 import com.David.JiuJitsuJournal.Api.Responses.Opponent;
 
