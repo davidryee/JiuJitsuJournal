@@ -6,10 +6,6 @@ import javax.persistence.*;
 @Table(name="beltRanks")
 public class BeltRank {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    //@OneToMany
     @Column(name = "beltRankId")
     private int beltRankId;
 
