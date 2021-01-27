@@ -1,6 +1,6 @@
 package com.David.JiuJitsuJournal.Api;
 
-import com.David.JiuJitsuJournal.Api.Mappers.OpponentMapper.OpponentMapper;
+import com.David.JiuJitsuJournal.Api.Mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.Domain.Models.Opponent;
 import com.David.JiuJitsuJournal.Domain.OpponentManager;
 import org.springframework.web.bind.annotation.GetMapping;

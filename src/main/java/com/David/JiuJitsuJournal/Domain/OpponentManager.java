@@ -8,11 +8,13 @@ import java.util.List;
 
 @Component
 public class OpponentManager {
-    public List<Opponent> GetOpponents(){
-        List<Opponent> opponents = new LinkedList<>();
-        opponents.add(new Opponent("Royce Gracie", BeltRankEnum.BLACK));
-        opponents.add(new Opponent("Chuck Norris", BeltRankEnum.BROWN));
+    private OpponentDataService opponentDataService;
 
-        return opponents;
+    public OpponentManager(OpponentDataService opponentDataService){
+        this.opponentDataService = opponentDataService;
+    }
+
+    public List<Opponent> GetOpponents(){
+        return this.opponentDataService.GetAllOpponents();
     }
 }
