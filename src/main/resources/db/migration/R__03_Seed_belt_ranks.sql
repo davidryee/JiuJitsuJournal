@@ -1,4 +1,4 @@
-INSERT INTO `beltRanks` (beltRankId, color)
+INSERT INTO `belt_ranks` (belt_rank_id, color)
 VALUES
        (1, 'white'),
        (2, 'blue'),

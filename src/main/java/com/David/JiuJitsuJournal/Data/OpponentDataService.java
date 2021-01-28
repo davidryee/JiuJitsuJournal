@@ -1,7 +1,9 @@
 package com.David.JiuJitsuJournal.Data;
 
+import com.David.JiuJitsuJournal.Data.Entities.BeltRank;
 import com.David.JiuJitsuJournal.Data.Mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.Data.Repository.OpponentRepository;
+import com.David.JiuJitsuJournal.Domain.BeltRankEnum;
 import com.David.JiuJitsuJournal.Domain.Models.Opponent;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +22,20 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.Opp
         List<Opponent> opponents = new LinkedList();
         List<com.David.JiuJitsuJournal.Data.Entities.Opponent> opponentEntities = this.opponentRepository.findAll();
         for (com.David.JiuJitsuJournal.Data.Entities.Opponent opponentEntity : opponentEntities) {
-            opponents.add(OpponentMapper.MapEntityToDomain(opponentEntity));
+            opponents.add(OpponentMapper.mapEntityToDomain(opponentEntity));
         }
         return opponents;
+    }
+
+    @Override
+    public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+            throws Exception {
+        BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+        com.David.JiuJitsuJournal.Data.Entities.Opponent opponentToSave = new com.David.JiuJitsuJournal.Data.Entities.Opponent(name, beltRankToPersist, heightInInches, weightInLbs);
+        com.David.JiuJitsuJournal.Data.Entities.Opponent savedOpponent = this.opponentRepository.save(opponentToSave);
+        if(savedOpponent != null){
+            return OpponentMapper.mapEntityToDomain(savedOpponent);
+        }
+        throw new Exception("Opponent not saved to database!");
     }
 }
