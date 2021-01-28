@@ -13,8 +13,9 @@ public class Opponent {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "beltRankId")
-    private int beltRankId;
+    @ManyToOne
+    @JoinColumn(name = "beltRankId")
+    private BeltRank beltRank;
 
     @Column(name = "heightInInches")
     private int heightInInches;
@@ -26,9 +27,9 @@ public class Opponent {
 
     }
 
-    public Opponent(String name, int beltRankId){
+    public Opponent(String name, BeltRank beltRank){
         this.name = name;
-        this.beltRankId = beltRankId;
+        this.beltRank = beltRank;
     }
 
     public long getId(){
@@ -47,12 +48,12 @@ public class Opponent {
         this.name = name;
     }
 
-    public int getBeltRankId(){
-        return this.beltRankId;
+    public BeltRank getBeltRank(){
+        return this.beltRank;
     }
 
-    public void setBeltRankId(int beltRankId){
-        this.beltRankId = beltRankId;
+    public void setBeltRank(BeltRank beltRank){
+        this.beltRank = beltRank;
     }
 
     public int getHeightInInches() {
