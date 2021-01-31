@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,14 +36,19 @@ public class OpponentController {
     }
 
     @PostMapping("/opponents")
-    public ResponseEntity<com.David.JiuJitsuJournal.Api.Responses.Opponent> createOpponent(@RequestBody OpponentRequest opponentRequest){
+    public ResponseEntity createOpponent(
+            @Valid @RequestBody OpponentRequest opponentRequest){
         try {
             Opponent domainOpponent = this.opponentManager.createOpponent(opponentRequest.getName(),
                                                                           opponentRequest.getBeltRank(),
                                                                           opponentRequest.getHeightInInches(),
                                                                           opponentRequest.getWeightInLbs());
             return new ResponseEntity<>(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
-        } catch (Exception e) {
+        }
+        catch(ConstraintViolationException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+        catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
