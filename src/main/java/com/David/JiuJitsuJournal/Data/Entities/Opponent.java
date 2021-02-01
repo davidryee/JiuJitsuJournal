@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Opponent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "name")
@@ -27,9 +27,11 @@ public class Opponent {
 
     }
 
-    public Opponent(String name, BeltRank beltRank){
+    public Opponent(String name, BeltRank beltRank, int heightInInches, int weightInLbs){
         this.name = name;
         this.beltRank = beltRank;
+        this.heightInInches = heightInInches;
+        this.weightInLbs = weightInLbs;
     }
 
     public long getId(){
