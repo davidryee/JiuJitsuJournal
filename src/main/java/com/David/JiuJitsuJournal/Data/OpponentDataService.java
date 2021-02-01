@@ -20,7 +20,7 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.Opp
         this.opponentRepository = opponentRepository;
     }
     @Override
-    public List<Opponent> GetAllOpponents(String name, Integer beltRank) {
+    public List<Opponent> getAllOpponents(String name, Integer beltRank) {
         Specification<com.David.JiuJitsuJournal.Data.Entities.Opponent> spec = Specification.where(
                                                                                 OpponentSpecification.withName(name))
                                                                                 .and(OpponentSpecification.

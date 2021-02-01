@@ -25,7 +25,7 @@ public class OpponentController {
     public Iterable<com.David.JiuJitsuJournal.Api.Responses.Opponent> getOpponents(@RequestParam(required = false) String name,
                                                                                    @RequestParam(required = false) Integer beltRank) {
         List<com.David.JiuJitsuJournal.Api.Responses.Opponent> opponentDtos = new LinkedList<>();
-        List<Opponent> opponents = opponentManager.GetOpponents(name, beltRank);
+        List<Opponent> opponents = opponentManager.getOpponents(name, beltRank);
         for(Opponent opponentModel : opponents){
             opponentDtos.add(OpponentMapper.mapToDto(opponentModel));
         }
