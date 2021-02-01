@@ -6,10 +6,7 @@ import com.David.JiuJitsuJournal.Domain.Models.Opponent;
 import com.David.JiuJitsuJournal.Domain.OpponentManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
@@ -25,10 +22,10 @@ public class OpponentController {
     }
 
     @GetMapping("/opponents")
-    public Iterable<com.David.JiuJitsuJournal.Api.Responses.Opponent> getOpponents() {
-
+    public Iterable<com.David.JiuJitsuJournal.Api.Responses.Opponent> getOpponents(@RequestParam(required = false) String name,
+                                                                                   @RequestParam(required = false) Integer beltRank) {
         List<com.David.JiuJitsuJournal.Api.Responses.Opponent> opponentDtos = new LinkedList<>();
-        List<Opponent> opponents = opponentManager.GetOpponents();
+        List<Opponent> opponents = opponentManager.getOpponents(name, beltRank);
         for(Opponent opponentModel : opponents){
             opponentDtos.add(OpponentMapper.mapToDto(opponentModel));
         }
