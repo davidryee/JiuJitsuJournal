@@ -13,8 +13,8 @@ public class OpponentManager {
         this.opponentDataService = opponentDataService;
     }
 
-    public List<Opponent> GetOpponents(){
-        return this.opponentDataService.GetAllOpponents();
+    public List<Opponent> GetOpponents(String name, Integer beltRank){
+        return this.opponentDataService.GetAllOpponents(name, beltRank);
     }
 
     public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs) throws Exception {
