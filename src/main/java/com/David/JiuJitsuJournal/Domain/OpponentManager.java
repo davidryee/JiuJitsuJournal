@@ -18,7 +18,6 @@ public class OpponentManager {
     }
 
     public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs) throws Exception {
-        //TODO: perform validations
         return this.opponentDataService.createOpponent(name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs);
     }
 }
