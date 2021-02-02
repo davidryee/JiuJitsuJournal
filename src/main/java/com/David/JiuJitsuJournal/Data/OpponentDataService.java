@@ -73,7 +73,10 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.Opp
         retrievedOpponent.setBeltRank(beltRankToPersist);
         retrievedOpponent.setHeightInInches(heightInInches);
         retrievedOpponent.setWeightInLbs(weightInLbs);
-        opponentRepository.save(retrievedOpponent);
-        return OpponentMapper.mapEntityToDomain(retrievedOpponent);
+        com.David.JiuJitsuJournal.Data.Entities.Opponent savedOpponent = opponentRepository.save(retrievedOpponent);
+        if(savedOpponent != null){
+            return OpponentMapper.mapEntityToDomain(savedOpponent);
+        }
+        throw new Exception("Opponent not saved to database!");
     }
 }
