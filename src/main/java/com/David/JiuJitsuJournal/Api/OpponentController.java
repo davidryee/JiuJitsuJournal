@@ -32,6 +32,16 @@ public class OpponentController {
         return opponentDtos;
     }
 
+    @GetMapping("/opponents/{id}")
+    public ResponseEntity getOpponent(@PathVariable("id") Long id) {
+        Opponent domainOpponent = opponentManager.getOpponentById(id);
+        if(domainOpponent == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));
+        }
+
+        return new ResponseEntity<>(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
+    }
+
     @PostMapping("/opponents")
     public ResponseEntity createOpponent(
             @Valid @RequestBody OpponentRequest opponentRequest){
