@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.OpponentDataService {
@@ -32,6 +33,17 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.Opp
             opponents.add(OpponentMapper.mapEntityToDomain(opponentEntity));
         }
         return opponents;
+    }
+
+    @Override
+    public Opponent getOpponentById(Long id) {
+        Optional<com.David.JiuJitsuJournal.Data.Entities.Opponent> opponentEntity =  this.opponentRepository.findById(id);
+        if(opponentEntity.isEmpty()){
+            return null;
+        }
+        else {
+            return OpponentMapper.mapEntityToDomain(opponentEntity.get());
+        }
     }
 
     @Override
