@@ -57,4 +57,26 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.Domain.Opp
         }
         throw new Exception("Opponent not saved to database!");
     }
+
+    @Override
+    public Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+            throws Exception {
+        Optional<com.David.JiuJitsuJournal.Data.Entities.Opponent> opponentToUpdate = this.opponentRepository.findById(id);
+        if(opponentToUpdate.isEmpty()){
+            return null;
+        }
+
+        BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+
+        com.David.JiuJitsuJournal.Data.Entities.Opponent retrievedOpponent = opponentToUpdate.get();
+        retrievedOpponent.setName(name);
+        retrievedOpponent.setBeltRank(beltRankToPersist);
+        retrievedOpponent.setHeightInInches(heightInInches);
+        retrievedOpponent.setWeightInLbs(weightInLbs);
+        com.David.JiuJitsuJournal.Data.Entities.Opponent savedOpponent = opponentRepository.save(retrievedOpponent);
+        if(savedOpponent != null){
+            return OpponentMapper.mapEntityToDomain(savedOpponent);
+        }
+        throw new Exception("Opponent not saved to database!");
+    }
 }
