@@ -2,11 +2,14 @@ package com.David.JiuJitsuJournal.api.controllers;
 
 import com.David.JiuJitsuJournal.api.mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.api.requests.OpponentRequest;
-import com.David.JiuJitsuJournal.domain.models.Opponent;
 import com.David.JiuJitsuJournal.domain.OpponentManager;
+import com.David.JiuJitsuJournal.domain.UserManager;
+import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.ConstraintViolationException;
@@ -17,6 +20,7 @@ import java.util.List;
 @RestController
 public class OpponentController {
     private OpponentManager opponentManager;
+    private UserDetails userDetails;
 
     public OpponentController(OpponentManager opponentManager){
         this.opponentManager = opponentManager;
@@ -49,11 +53,14 @@ public class OpponentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity createOpponent(
             @Valid @RequestBody OpponentRequest opponentRequest){
+        this.userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         try {
             Opponent domainOpponent = this.opponentManager.createOpponent(opponentRequest.getName(),
                                                                           opponentRequest.getBeltRank(),
                                                                           opponentRequest.getHeightInInches(),
-                                                                          opponentRequest.getWeightInLbs());
+                                                                          opponentRequest.getWeightInLbs(),
+                                                                          this.userDetails.getUsername());
 
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
         }

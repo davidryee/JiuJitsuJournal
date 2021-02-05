@@ -1,8 +1,10 @@
 package com.David.JiuJitsuJournal.data;
 
 import com.David.JiuJitsuJournal.data.entities.BeltRank;
+import com.David.JiuJitsuJournal.data.entities.User;
 import com.David.JiuJitsuJournal.data.mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.data.repository.OpponentRepository;
+import com.David.JiuJitsuJournal.data.repository.UserRepository;
 import com.David.JiuJitsuJournal.data.specification.OpponentSpecification;
 import com.David.JiuJitsuJournal.domain.BeltRankEnum;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
@@ -17,8 +19,10 @@ import java.util.Optional;
 public class OpponentDataService implements com.David.JiuJitsuJournal.domain.OpponentDataService {
 
     OpponentRepository opponentRepository;
-    public OpponentDataService(OpponentRepository opponentRepository){
+    UserRepository userRepository;
+    public OpponentDataService(OpponentRepository opponentRepository, UserRepository userRepository){
         this.opponentRepository = opponentRepository;
+        this.userRepository = userRepository;
     }
     @Override
     public List<Opponent> getAllOpponents(String name, Integer beltRank) {
@@ -47,10 +51,12 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+    public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username)
             throws Exception {
         BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+        User userEntity = userRepository.findByUsername(username).get();
         com.David.JiuJitsuJournal.data.entities.Opponent opponentToSave = new com.David.JiuJitsuJournal.data.entities.Opponent(name, beltRankToPersist, heightInInches, weightInLbs);
+        opponentToSave.setUser(userEntity);
         com.David.JiuJitsuJournal.data.entities.Opponent savedOpponent = this.opponentRepository.save(opponentToSave);
         if(savedOpponent != null){
             return OpponentMapper.mapEntityToDomain(savedOpponent);
