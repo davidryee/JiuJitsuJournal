@@ -25,11 +25,13 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
         this.userRepository = userRepository;
     }
     @Override
-    public List<Opponent> getAllOpponents(String name, Integer beltRank) {
+    public List<Opponent> getAllOpponents(String name, Integer beltRank, String username) {
+        User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
                                                                                 OpponentSpecification.withName(name))
                                                                                 .and(OpponentSpecification.
-                                                                                        withBeltRank(beltRank));
+                                                                                        withBeltRank(beltRank))
+                                                                                .and(OpponentSpecification.withUser(user));
         List<Opponent> opponents = new LinkedList();
         List<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntities = this.opponentRepository.findAll(spec);
 

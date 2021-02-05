@@ -30,8 +30,10 @@ public class OpponentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Iterable<com.David.JiuJitsuJournal.api.responses.Opponent> getOpponents(@RequestParam(required = false) String name,
                                                                                    @RequestParam(required = false) Integer beltRank) {
+        this.userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         List<com.David.JiuJitsuJournal.api.responses.Opponent> opponentDtos = new LinkedList<>();
-        List<Opponent> opponents = opponentManager.getOpponents(name, beltRank);
+        List<Opponent> opponents = opponentManager.getOpponents(name, beltRank, userDetails.getUsername());
         for(Opponent opponentModel : opponents){
             opponentDtos.add(OpponentMapper.mapToDto(opponentModel));
         }

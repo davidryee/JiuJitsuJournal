@@ -17,8 +17,8 @@ public class OpponentManager {
         return this.opponentDataService.getOpponentById(id);
     }
 
-    public List<Opponent> getOpponents(String name, Integer beltRank){
-        return this.opponentDataService.getAllOpponents(name, beltRank);
+    public List<Opponent> getOpponents(String name, Integer beltRank, String username){
+        return this.opponentDataService.getAllOpponents(name, beltRank, username);
     }
 
     public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
