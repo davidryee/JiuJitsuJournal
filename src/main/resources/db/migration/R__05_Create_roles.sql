@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS `roles` (
+`id` int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+`name` varchar(50)
+)
