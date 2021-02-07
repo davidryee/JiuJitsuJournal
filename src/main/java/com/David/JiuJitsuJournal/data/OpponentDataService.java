@@ -1,14 +1,17 @@
 package com.David.JiuJitsuJournal.data;
 
 import com.David.JiuJitsuJournal.data.entities.BeltRank;
+import com.David.JiuJitsuJournal.data.entities.User;
 import com.David.JiuJitsuJournal.data.mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.data.repository.OpponentRepository;
+import com.David.JiuJitsuJournal.data.repository.UserRepository;
 import com.David.JiuJitsuJournal.data.specification.OpponentSpecification;
 import com.David.JiuJitsuJournal.domain.BeltRankEnum;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,15 +20,19 @@ import java.util.Optional;
 public class OpponentDataService implements com.David.JiuJitsuJournal.domain.OpponentDataService {
 
     OpponentRepository opponentRepository;
-    public OpponentDataService(OpponentRepository opponentRepository){
+    UserRepository userRepository;
+    public OpponentDataService(OpponentRepository opponentRepository, UserRepository userRepository){
         this.opponentRepository = opponentRepository;
+        this.userRepository = userRepository;
     }
     @Override
-    public List<Opponent> getAllOpponents(String name, Integer beltRank) {
+    public List<Opponent> getAllOpponents(String name, Integer beltRank, String username) {
+        User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
                                                                                 OpponentSpecification.withName(name))
                                                                                 .and(OpponentSpecification.
-                                                                                        withBeltRank(beltRank));
+                                                                                        withBeltRank(beltRank))
+                                                                                .and(OpponentSpecification.withUser(user));
         List<Opponent> opponents = new LinkedList();
         List<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntities = this.opponentRepository.findAll(spec);
 
@@ -36,8 +43,13 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent getOpponentById(Long id) {
-        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntity =  this.opponentRepository.findById(id);
+    public Opponent getOpponentById(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                                                                                OpponentSpecification.withId(id))
+                                                                                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntity = this.opponentRepository.findOne(spec);
+
         if(opponentEntity.isEmpty()){
             return null;
         }
@@ -47,10 +59,12 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+    public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username)
             throws Exception {
         BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+        User userEntity = userRepository.findByUsername(username).get();
         com.David.JiuJitsuJournal.data.entities.Opponent opponentToSave = new com.David.JiuJitsuJournal.data.entities.Opponent(name, beltRankToPersist, heightInInches, weightInLbs);
+        opponentToSave.setUser(userEntity);
         com.David.JiuJitsuJournal.data.entities.Opponent savedOpponent = this.opponentRepository.save(opponentToSave);
         if(savedOpponent != null){
             return OpponentMapper.mapEntityToDomain(savedOpponent);
@@ -59,9 +73,14 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+    public Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username)
             throws Exception {
-        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findById(id);
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                OpponentSpecification.withId(id))
+                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findOne(spec);
+
         if(opponentToUpdate.isEmpty()){
             return null;
         }
@@ -78,5 +97,20 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
             return OpponentMapper.mapEntityToDomain(savedOpponent);
         }
         throw new Exception("Opponent not saved to database!");
+    }
+
+    @Override
+    public void deleteOpponent(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                OpponentSpecification.withId(id))
+                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToDelete = this.opponentRepository.findOne(spec);
+
+        if(opponentToDelete.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+
+        opponentRepository.delete(opponentToDelete.get());
     }
 }

@@ -9,6 +9,7 @@ public class OpponentMapper {
         opponentDto.setBeltRank(opponentModel.getBeltRank());
         opponentDto.setHeightInInches(opponentModel.getHeightInInches());
         opponentDto.setWeightInLbs(opponentModel.getWeightInLbs());
+        opponentDto.setId(opponentModel.getId());
         return opponentDto;
     }
 }

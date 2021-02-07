@@ -1,0 +1,4 @@
+ALTER TABLE `opponents`
+ADD COLUMN `user_id` INT NOT NULL,
+ADD CONSTRAINT `FK_USERS_TABLE_USER_ID` FOREIGN KEY (`user_id`)
+REFERENCES `users`(`id`)

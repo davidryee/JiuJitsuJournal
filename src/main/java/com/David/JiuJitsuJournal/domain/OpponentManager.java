@@ -13,19 +13,23 @@ public class OpponentManager {
         this.opponentDataService = opponentDataService;
     }
 
-    public Opponent getOpponentById(Long id) {
-        return this.opponentDataService.getOpponentById(id);
+    public Opponent getOpponentById(Long id, String username) {
+        return this.opponentDataService.getOpponentById(id, username);
     }
 
-    public List<Opponent> getOpponents(String name, Integer beltRank){
-        return this.opponentDataService.getAllOpponents(name, beltRank);
+    public List<Opponent> getOpponents(String name, Integer beltRank, String username){
+        return this.opponentDataService.getAllOpponents(name, beltRank, username);
     }
 
-    public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs) throws Exception {
-        return this.opponentDataService.createOpponent(name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs);
+    public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
+        return this.opponentDataService.createOpponent(name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
     }
 
-    public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs) throws Exception {
-        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs);
+    public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
+        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
+    }
+
+    public void deleteOpponent(Long id, String username) {
+        this.opponentDataService.deleteOpponent(id, username);
     }
 }

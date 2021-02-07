@@ -23,6 +23,9 @@ public class Opponent {
     @Column(name = "weightInLbs")
     private int weightInLbs;
 
+    @ManyToOne
+    private User user;
+
     public Opponent(){
 
     }
@@ -72,5 +75,13 @@ public class Opponent {
 
     public void setWeightInLbs(int weightInLbs) {
         this.weightInLbs = weightInLbs;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

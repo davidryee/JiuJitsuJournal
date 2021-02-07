@@ -3,6 +3,7 @@ package com.David.JiuJitsuJournal.api.responses;
 import com.David.JiuJitsuJournal.domain.BeltRankEnum;
 
 public class Opponent {
+    private Long id;
     private String name;
     private BeltRankEnum beltRank;
     private int heightInInches;
@@ -38,4 +39,8 @@ public class Opponent {
     public void setWeightInLbs(int weightInLbs) {
         this.weightInLbs = weightInLbs;
     }
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 }
