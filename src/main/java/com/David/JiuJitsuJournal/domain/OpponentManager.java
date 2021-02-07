@@ -28,4 +28,8 @@ public class OpponentManager {
     public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
         return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
     }
+
+    public void deleteOpponent(Long id, String username) {
+        this.opponentDataService.deleteOpponent(id, username);
+    }
 }

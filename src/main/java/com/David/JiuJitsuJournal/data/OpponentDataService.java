@@ -11,6 +11,7 @@ import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -96,5 +97,20 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
             return OpponentMapper.mapEntityToDomain(savedOpponent);
         }
         throw new Exception("Opponent not saved to database!");
+    }
+
+    @Override
+    public void deleteOpponent(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                OpponentSpecification.withId(id))
+                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToDelete = this.opponentRepository.findOne(spec);
+
+        if(opponentToDelete.isEmpty()) {
+            throw new EntityNotFoundException();
+        }
+
+        opponentRepository.delete(opponentToDelete.get());
     }
 }

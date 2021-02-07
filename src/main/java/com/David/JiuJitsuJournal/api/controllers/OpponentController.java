@@ -3,7 +3,6 @@ package com.David.JiuJitsuJournal.api.controllers;
 import com.David.JiuJitsuJournal.api.mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.api.requests.OpponentRequest;
 import com.David.JiuJitsuJournal.domain.OpponentManager;
-import com.David.JiuJitsuJournal.domain.UserManager;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,9 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -104,5 +103,20 @@ public class OpponentController {
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @DeleteMapping("/opponents/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity deleteOpponent(@PathVariable("id") Long id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        try {
+            this.opponentManager.deleteOpponent(id, userDetails.getUsername());
+        }
+        catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));
+        }
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 }
