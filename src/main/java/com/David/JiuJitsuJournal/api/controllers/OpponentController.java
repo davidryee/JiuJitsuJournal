@@ -83,12 +83,15 @@ public class OpponentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity updateOpponent(@Valid @RequestBody OpponentRequest opponentRequest,
                                          @PathVariable("id") Long id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
         try {
             Opponent domainOpponent = this.opponentManager.updateOpponent(id,
                                                                           opponentRequest.getName(),
                                                                           opponentRequest.getBeltRank(),
                                                                           opponentRequest.getHeightInInches(),
-                                                                          opponentRequest.getWeightInLbs());
+                                                                          opponentRequest.getWeightInLbs(),
+                                                                          userDetails.getUsername());
 
             if(domainOpponent == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));

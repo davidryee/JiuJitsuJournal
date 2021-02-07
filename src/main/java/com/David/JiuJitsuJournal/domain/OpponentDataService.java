@@ -8,5 +8,5 @@ public interface OpponentDataService {
     List<Opponent> getAllOpponents(String name, Integer beltRank, String username);
     Opponent getOpponentById(Long id, String username);
     Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username) throws Exception;
-    Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs) throws Exception;
+    Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username) throws Exception;
 }

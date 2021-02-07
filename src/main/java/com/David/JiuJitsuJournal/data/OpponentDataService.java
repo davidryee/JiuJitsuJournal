@@ -72,9 +72,14 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs)
+    public Opponent updateOpponent(Long id, String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username)
             throws Exception {
-        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findById(id);
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                OpponentSpecification.withId(id))
+                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findOne(spec);
+
         if(opponentToUpdate.isEmpty()){
             return null;
         }

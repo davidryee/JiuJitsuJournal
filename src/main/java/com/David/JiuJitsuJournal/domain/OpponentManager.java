@@ -25,7 +25,7 @@ public class OpponentManager {
         return this.opponentDataService.createOpponent(name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
     }
 
-    public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs) throws Exception {
-        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs);
+    public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
+        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
     }
 }
