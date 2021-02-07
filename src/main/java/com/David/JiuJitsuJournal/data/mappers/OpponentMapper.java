@@ -9,6 +9,7 @@ public class OpponentMapper {
                 opponentEntity.getName(),
                 BeltRankEnum.values()[opponentEntity.getBeltRank().getBeltRankId()],
                 opponentEntity.getHeightInInches(),
-                opponentEntity.getWeightInLbs());
+                opponentEntity.getWeightInLbs(),
+                opponentEntity.getId());
     }
 }

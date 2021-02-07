@@ -42,8 +42,13 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.Opp
     }
 
     @Override
-    public Opponent getOpponentById(Long id) {
-        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntity =  this.opponentRepository.findById(id);
+    public Opponent getOpponentById(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
+                                                                                OpponentSpecification.withId(id))
+                                                                                .and(OpponentSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntity = this.opponentRepository.findOne(spec);
+
         if(opponentEntity.isEmpty()){
             return null;
         }

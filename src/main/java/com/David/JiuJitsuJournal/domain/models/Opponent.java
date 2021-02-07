@@ -7,12 +7,14 @@ public class Opponent {
     private BeltRankEnum beltRank;
     private int heightInInches;
     private int weightInLbs;
+    private Long id;
 
-    public Opponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs) {
+    public Opponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, Long id) {
         this.name = name;
         this.beltRank = beltRank;
         this.heightInInches = heightInInches;
         this.weightInLbs = weightInLbs;
+        this.id = id;
     }
     public String getName(){
         return this.name;
@@ -44,4 +46,8 @@ public class Opponent {
     public void setHeightInInches(int heightInInches) {
         this.heightInInches = heightInInches;
     }
+
+    public Long getId() { return id; }
+
+    public void setId(Long id) { this.id = id; }
 }

@@ -13,8 +13,8 @@ public class OpponentManager {
         this.opponentDataService = opponentDataService;
     }
 
-    public Opponent getOpponentById(Long id) {
-        return this.opponentDataService.getOpponentById(id);
+    public Opponent getOpponentById(Long id, String username) {
+        return this.opponentDataService.getOpponentById(id, username);
     }
 
     public List<Opponent> getOpponents(String name, Integer beltRank, String username){

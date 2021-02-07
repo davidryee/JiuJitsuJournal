@@ -16,4 +16,8 @@ public class OpponentSpecification {
     public static Specification<Opponent> withUser(User user) {
         return (root, query, cb) -> user == null ? null : cb.equal(root.get("user"), user);
     }
+
+    public static Specification<Opponent> withId(Long id) {
+        return (root, query, cb) -> id == null ? null : cb.equal(root.get("id"), id);
+    }
 }
