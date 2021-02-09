@@ -6,7 +6,7 @@ import com.David.JiuJitsuJournal.domain.models.User;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDataService implements com.David.JiuJitsuJournal.domain.UserDataService {
+public class UserDataService implements com.David.JiuJitsuJournal.domain.dataServices.UserDataService {
     UserRepository userRepository;
 
     public UserDataService(UserRepository userRepository){

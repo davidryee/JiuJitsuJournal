@@ -2,7 +2,7 @@ package com.David.JiuJitsuJournal.api.controllers;
 
 import com.David.JiuJitsuJournal.api.mappers.OpponentMapper;
 import com.David.JiuJitsuJournal.api.requests.OpponentRequest;
-import com.David.JiuJitsuJournal.domain.OpponentManager;
+import com.David.JiuJitsuJournal.domain.managers.OpponentManager;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
