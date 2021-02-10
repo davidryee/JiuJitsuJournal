@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class OpponentDataService implements com.David.JiuJitsuJournal.domain.OpponentDataService {
+public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dataServices.OpponentDataService {
 
     OpponentRepository opponentRepository;
     UserRepository userRepository;

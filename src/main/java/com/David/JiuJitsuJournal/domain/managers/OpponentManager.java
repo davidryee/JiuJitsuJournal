@@ -1,5 +1,7 @@
-package com.David.JiuJitsuJournal.domain;
+package com.David.JiuJitsuJournal.domain.managers;
 
+import com.David.JiuJitsuJournal.domain.BeltRankEnum;
+import com.David.JiuJitsuJournal.domain.dataServices.OpponentDataService;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.stereotype.Component;
 

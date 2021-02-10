@@ -1,5 +1,6 @@
-package com.David.JiuJitsuJournal.domain;
+package com.David.JiuJitsuJournal.domain.managers;
 
+import com.David.JiuJitsuJournal.domain.dataServices.UserDataService;
 import com.David.JiuJitsuJournal.domain.models.User;
 import org.springframework.stereotype.Component;
 
