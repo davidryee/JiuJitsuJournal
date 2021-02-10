@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,9 +69,6 @@ public class OpponentController {
 
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
         }
-        catch(ConstraintViolationException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -96,9 +92,6 @@ public class OpponentController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));
             }
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
-        }
-        catch(ConstraintViolationException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

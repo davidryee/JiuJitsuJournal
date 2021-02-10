@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 @RestController
@@ -36,9 +35,6 @@ public class MatchController {
                                           matchRequest.getDescription(),
                                           userDetails.getUsername());
             return new ResponseEntity(MatchMapper.mapToDto(domainMatch), HttpStatus.OK);
-        }
-        catch(ConstraintViolationException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

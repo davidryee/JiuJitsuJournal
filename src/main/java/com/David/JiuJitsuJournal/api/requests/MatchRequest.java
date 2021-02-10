@@ -10,17 +10,17 @@ import java.time.LocalDate;
 
 public class MatchRequest {
 
-    @NotNull(message = "Match date must be provided.")
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @PastOrPresent
     private LocalDate matchDate;
 
-    @NotNull(message = "Opponent Id must be provided.")
+    @NotNull
     @Min(1)
     private Long opponentId;
 
-    @NotNull(message = "Match description must be provided.")
-    @NotBlank(message = "Match description must not be blank.")
+    @NotNull
+    @NotBlank
     private String description;
 
     public MatchRequest(LocalDate matchDate, Long opponentId, String description) {

@@ -15,17 +15,16 @@ public class OpponentRequest {
     public static final int WHITE_BELT = 0;
     public static final int BLACK_BELT = 4;
 
-
-    @NotNull(message = "Opponent name must be provided.")
-    @NotBlank(message = "Opponent name must not be blank.")
+    @NotNull
+    @NotBlank
     private String name;
 
-    @NotNull(message = "Opponent belt rank must be provided.")
+    @NotNull
     @Min(WHITE_BELT)
     @Max(BLACK_BELT)
     private Integer beltRank;
 
-    @NotNull(message = "Opponent height must be provided.")
+    @NotNull
     @Min(value = FOUR_FEET_TALL)
     @Max(EIGHT_FEET_TALL)
     private Integer heightInInches;
