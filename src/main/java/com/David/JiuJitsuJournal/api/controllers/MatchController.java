@@ -4,17 +4,19 @@ import com.David.JiuJitsuJournal.api.mappers.MatchMapper;
 import com.David.JiuJitsuJournal.api.requests.MatchRequest;
 import com.David.JiuJitsuJournal.domain.managers.MatchManager;
 import com.David.JiuJitsuJournal.domain.models.Match;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 public class MatchController {
@@ -22,6 +24,22 @@ public class MatchController {
 
     public MatchController(MatchManager matchManager) {
         this.matchManager = matchManager;
+    }
+
+    @GetMapping("/matches")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public Iterable<com.David.JiuJitsuJournal.api.responses.Match> getMatches(@RequestParam(required = false) String opponentName,
+                                                                              @RequestParam(required = false) Integer opponentBeltRank,
+                                                                              @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate matchDate) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        List<Match> matches = matchManager.getMatches(opponentName, opponentBeltRank, matchDate, userDetails.getUsername());
+        List<com.David.JiuJitsuJournal.api.responses.Match> matchDtos = new LinkedList<>();
+        for (Match matchModel : matches) {
+            matchDtos.add(MatchMapper.mapToDto(matchModel));
+        }
+
+        return matchDtos;
     }
 
     @PostMapping("/matches")

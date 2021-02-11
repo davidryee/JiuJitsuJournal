@@ -1,4 +1,4 @@
-package com.David.JiuJitsuJournal.data;
+package com.David.JiuJitsuJournal.data.services;
 
 import com.David.JiuJitsuJournal.data.entities.BeltRank;
 import com.David.JiuJitsuJournal.data.entities.User;

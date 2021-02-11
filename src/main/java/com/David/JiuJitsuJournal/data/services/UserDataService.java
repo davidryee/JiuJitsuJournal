@@ -1,4 +1,4 @@
-package com.David.JiuJitsuJournal.data;
+package com.David.JiuJitsuJournal.data.services;
 
 import com.David.JiuJitsuJournal.data.mappers.UserMapper;
 import com.David.JiuJitsuJournal.data.repository.UserRepository;
