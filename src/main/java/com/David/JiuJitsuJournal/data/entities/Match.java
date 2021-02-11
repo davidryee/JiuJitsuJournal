@@ -11,6 +11,10 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    public Match() {
+
+    }
+
     public Match(LocalDate matchDate, User user, Opponent opponent, String description) {
         this.matchDate = matchDate;
         this.user = user;

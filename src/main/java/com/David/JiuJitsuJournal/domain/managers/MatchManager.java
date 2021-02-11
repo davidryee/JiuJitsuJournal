@@ -5,6 +5,7 @@ import com.David.JiuJitsuJournal.domain.models.Match;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class MatchManager {
@@ -15,5 +16,9 @@ public class MatchManager {
 
     public Match createMatch(LocalDate matchDate, Long opponentId, String description, String username) throws Exception {
         return this.matchDataService.createMatch(matchDate, opponentId, description, username);
+    }
+
+    public List<Match> getMatches(String opponentName, Integer opponentBeltRank, LocalDate matchDate, String username) {
+        return this.matchDataService.getMatches(opponentName, opponentBeltRank, matchDate, username);
     }
 }
