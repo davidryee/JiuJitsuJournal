@@ -30,7 +30,7 @@ public class OpponentController {
                                                                                    @RequestParam(required = false) Integer beltRank) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        List<com.David.JiuJitsuJournal.api.responses.Opponent> opponentDtos = new LinkedList<>();
+        List<com.David.JiuJitsuJournal.api.responses.Opponent> opponentDtos = new LinkedList();
         List<Opponent> opponents = opponentManager.getOpponents(name, beltRank, userDetails.getUsername());
         for(Opponent opponentModel : opponents){
             opponentDtos.add(OpponentMapper.mapToDto(opponentModel));
@@ -51,7 +51,7 @@ public class OpponentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));
         }
 
-        return new ResponseEntity<>(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
+        return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
     }
 
     @PostMapping("/opponents")
@@ -70,7 +70,7 @@ public class OpponentController {
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
         }
         catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -94,7 +94,7 @@ public class OpponentController {
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
         }
         catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

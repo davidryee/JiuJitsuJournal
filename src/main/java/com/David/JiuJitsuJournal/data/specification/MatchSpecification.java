@@ -20,4 +20,8 @@ public class MatchSpecification {
     public static Specification<Match> withOpponents(List<Opponent> opponents) {
         return ((root, query, cb) -> opponents == null ? null : cb.isTrue(root.get("opponent").in(opponents)));
     }
+
+    public static Specification<Match> withId(Long id) {
+        return ((root, query, cb) -> id == null ? null : cb.equal(root.get("id"), id));
+    }
 }

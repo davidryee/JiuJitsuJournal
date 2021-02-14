@@ -21,4 +21,8 @@ public class MatchManager {
     public List<Match> getMatches(String opponentName, Integer opponentBeltRank, LocalDate matchDate, String username) {
         return this.matchDataService.getMatches(opponentName, opponentBeltRank, matchDate, username);
     }
+
+    public Match getMatchById(Long id, String username) {
+        return this.matchDataService.getMatchById(id, username);
+    }
 }

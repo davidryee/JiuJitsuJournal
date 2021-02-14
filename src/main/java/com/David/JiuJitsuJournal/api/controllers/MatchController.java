@@ -26,6 +26,20 @@ public class MatchController {
         this.matchManager = matchManager;
     }
 
+    @GetMapping("/matches/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity getMatch(@PathVariable("id") Long id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        Match domainMatch = matchManager.getMatchById(id, userDetails.getUsername());
+
+        if(domainMatch == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Match with id %d does not exist", id));
+        }
+
+        return new ResponseEntity(MatchMapper.mapToDto(domainMatch), HttpStatus.OK);
+    }
+
     @GetMapping("/matches")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public Iterable<com.David.JiuJitsuJournal.api.responses.Match> getMatches(@RequestParam(required = false) String opponentName,
@@ -34,7 +48,7 @@ public class MatchController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         List<Match> matches = matchManager.getMatches(opponentName, opponentBeltRank, matchDate, userDetails.getUsername());
-        List<com.David.JiuJitsuJournal.api.responses.Match> matchDtos = new LinkedList<>();
+        List<com.David.JiuJitsuJournal.api.responses.Match> matchDtos = new LinkedList();
         for (Match matchModel : matches) {
             matchDtos.add(MatchMapper.mapToDto(matchModel));
         }
@@ -58,7 +72,7 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
