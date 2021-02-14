@@ -88,5 +88,20 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
         return matches;
     }
 
+    @Override
+    public Match getMatchById(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(
+                                                                            MatchSpecification.withId(id))
+                                                                            .and(MatchSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Match> matchEntity = this.matchRepository.findOne(spec);
+        if(matchEntity.isEmpty()){
+            return null;
+        }
+        else {
+            return MatchMapper.mapEntityToDomain(matchEntity.get());
+        }
+    }
+
 
 }
