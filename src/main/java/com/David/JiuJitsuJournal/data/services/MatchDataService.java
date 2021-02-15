@@ -103,5 +103,37 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
         }
     }
 
+    @Override
+    public Match updateMatch(Long id, LocalDate matchDate, Long opponentId, String description, String username) throws Exception {
+        User user = this.userRepository.findByUsername(username).get();
+
+        Specification<Opponent> opponentSpec = Specification.where(
+                OpponentSpecification.withId(opponentId))
+                .and(OpponentSpecification.withUser(user));
+        Optional<Opponent> opponentEntity = this.opponentRepository.findOne(opponentSpec);
+
+        if(opponentEntity.isEmpty()){
+            throw new EntityNotFoundException(String.format("Opponent with id %d not found.", opponentId));
+        }
+
+        Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(MatchSpecification.withId(id))
+                                                                            .and(MatchSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Match> matchToUpdate = this.matchRepository.findOne(spec);
+
+        if(matchToUpdate.isEmpty()){
+            throw new EntityNotFoundException(String.format("Match with id %d does not exist.", id));
+        }
+        com.David.JiuJitsuJournal.data.entities.Match retrievedMatch = matchToUpdate.get();
+        retrievedMatch.setMatchDate(matchDate);
+        retrievedMatch.setDescription(description);
+        retrievedMatch.setOpponent(opponentEntity.get());
+
+        com.David.JiuJitsuJournal.data.entities.Match savedMatch = matchRepository.save(retrievedMatch);
+        if(savedMatch != null) {
+            return MatchMapper.mapEntityToDomain(savedMatch);
+        }
+        throw new Exception("Match not saved to database");
+    }
+
 
 }

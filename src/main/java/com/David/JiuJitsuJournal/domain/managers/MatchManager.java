@@ -25,4 +25,8 @@ public class MatchManager {
     public Match getMatchById(Long id, String username) {
         return this.matchDataService.getMatchById(id, username);
     }
+
+    public Match updateMatch(Long id, LocalDate matchDate, Long opponentId, String description, String username) throws Exception {
+        return this.matchDataService.updateMatch(id, matchDate, opponentId, description, username);
+    }
 }
