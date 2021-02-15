@@ -135,5 +135,18 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
         throw new Exception("Match not saved to database");
     }
 
+    @Override
+    public void deleteMatch(Long id, String username) {
+        User user = this.userRepository.findByUsername(username).get();
+        Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(
+                MatchSpecification.withId(id))
+                .and(MatchSpecification.withUser(user));
+        Optional<com.David.JiuJitsuJournal.data.entities.Match> matchToDelete = this.matchRepository.findOne(spec);
 
+        if(matchToDelete.isEmpty()){
+            throw new EntityNotFoundException(String.format("Match with id %d does not exist", id));
+        }
+
+        matchRepository.delete(matchToDelete.get());
+    }
 }

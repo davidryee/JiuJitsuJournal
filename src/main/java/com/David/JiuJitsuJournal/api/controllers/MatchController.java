@@ -94,4 +94,19 @@ public class MatchController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
     }
+
+    @DeleteMapping("/matches/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity deleteMatch(@PathVariable("id") Long id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        try {
+            this.matchManager.deleteMatch(id, userDetails.getUsername());
+        }
+        catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 }
