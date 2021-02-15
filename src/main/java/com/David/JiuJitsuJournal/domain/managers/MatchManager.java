@@ -29,4 +29,8 @@ public class MatchManager {
     public Match updateMatch(Long id, LocalDate matchDate, Long opponentId, String description, String username) throws Exception {
         return this.matchDataService.updateMatch(id, matchDate, opponentId, description, username);
     }
+
+    public void deleteMatch(Long id, String username){
+        this.matchDataService.deleteMatch(id, username);
+    }
 }
