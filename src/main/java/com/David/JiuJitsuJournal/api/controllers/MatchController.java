@@ -75,4 +75,23 @@ public class MatchController {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/matches/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity updateMatch(@Valid @RequestBody MatchRequest matchRequest,
+                                      @PathVariable("id") Long id) throws Exception {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        try {
+            Match domainMatch = this.matchManager.updateMatch(id,
+                                                              matchRequest.getMatchDate(),
+                                                              matchRequest.getOpponentId(),
+                                                              matchRequest.getDescription(),
+                                                              userDetails.getUsername());
+            return new ResponseEntity(MatchMapper.mapToDto(domainMatch), HttpStatus.OK);
+        }
+        catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
 }

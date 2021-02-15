@@ -82,7 +82,7 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
         Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findOne(spec);
 
         if(opponentToUpdate.isEmpty()){
-            return null;
+            throw new EntityNotFoundException(String.format("Opponent with id %d does not exist", id));
         }
 
         BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());

@@ -88,10 +88,10 @@ public class OpponentController {
                                                                           opponentRequest.getWeightInLbs(),
                                                                           userDetails.getUsername());
 
-            if(domainOpponent == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("Opponent with id %d does not exist", id));
-            }
             return new ResponseEntity(OpponentMapper.mapToDto(domainOpponent), HttpStatus.OK);
+        }
+        catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         catch (Exception e) {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
