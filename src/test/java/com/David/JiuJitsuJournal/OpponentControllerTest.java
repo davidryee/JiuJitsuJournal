@@ -8,6 +8,7 @@ import com.David.JiuJitsuJournal.data.repository.UserRepository;
 import com.David.JiuJitsuJournal.domain.BeltRankEnum;
 import com.David.JiuJitsuJournal.domain.managers.OpponentManager;
 import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -43,6 +44,17 @@ public class OpponentControllerTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
+
+    @BeforeEach
+    private void setupAuth() {
+        UserDetails userDetails = mock(UserDetails.class);
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
+    }
+
     @Test
     public void getOpponentByIdShouldReturnOpponentIfItExists() {
         User userEntity = new User();
@@ -50,29 +62,43 @@ public class OpponentControllerTest {
 
         long opponentId = 1L;
 
-        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent();
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(1, "Brown"),
+                72,
+                176
+        );
         opponentEntity.setUser(userEntity);
-        opponentEntity.setBeltRank(new BeltRank(1, "Brown"));
-        opponentEntity.setHeightInInches(72);
-        opponentEntity.setWeightInLbs(176);
-        opponentEntity.setName("Royce Gracie");
         opponentEntity.setId(1L);
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
 
 
         opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
         opponentController = new OpponentController(opponentManager);
-        UserDetails userDetails = mock(UserDetails.class);
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
-
 
         ResponseEntity responseEntity = opponentController.getOpponent(opponentId);
         com.David.JiuJitsuJournal.api.responses.Opponent opponentDto = (com.David.JiuJitsuJournal.api.responses.Opponent) responseEntity.getBody();
 
+        assertOpponentFields(opponentEntity, responseEntity, opponentDto);
+    }
+
+    @Test
+    public void getOpponentByIdShouldReturn404IfOpponentDoesNotExist() {
+        User userEntity = new User();
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        long opponentId = 1L;
+
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentController = new OpponentController(opponentManager);
+
+        ResponseEntity responseEntity = opponentController.getOpponent(opponentId);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+
+    }
+
+    private void assertOpponentFields(com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity, ResponseEntity responseEntity, com.David.JiuJitsuJournal.api.responses.Opponent opponentDto) {
         assertEquals(Optional.of(opponentEntity.getId()).get(), opponentDto.getId());
         assertEquals(opponentEntity.getName(), opponentDto.getName());
         assertEquals(opponentEntity.getHeightInInches(), opponentDto.getHeightInInches());
