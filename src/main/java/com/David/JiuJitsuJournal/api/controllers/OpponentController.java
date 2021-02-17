@@ -26,7 +26,7 @@ public class OpponentController {
 
     @GetMapping("/opponents")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Iterable<com.David.JiuJitsuJournal.api.responses.Opponent> getOpponents(@RequestParam(required = false) String name,
+    public ResponseEntity getOpponents(@RequestParam(required = false) String name,
                                                                                    @RequestParam(required = false) Integer beltRank) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -35,7 +35,7 @@ public class OpponentController {
         for(Opponent opponentModel : opponents){
             opponentDtos.add(OpponentMapper.mapToDto(opponentModel));
         }
-        return opponentDtos;
+        return new ResponseEntity(opponentDtos, HttpStatus.OK);
     }
 
     @GetMapping("/opponents/{id}")
