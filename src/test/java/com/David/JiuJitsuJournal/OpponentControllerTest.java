@@ -195,7 +195,7 @@ public class OpponentControllerTest {
     }
 
     @Test
-    public void createOpponentShouldThrowExceptionIfDatabaseSaveFails() {
+    public void createOpponentShouldReturn500IfDatabaseSaveFails() {
         OpponentRequest request = new OpponentRequest("Test Fighter", 3, 72, 200);
         User userEntity = new User();
         when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
