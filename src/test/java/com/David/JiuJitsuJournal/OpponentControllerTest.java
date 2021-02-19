@@ -274,6 +274,43 @@ public class OpponentControllerTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
 
+    @Test
+    public void deleteOpponentShouldNoContentIfSuccessful() {
+        User userEntity = new User();
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+
+        long opponentId = 1L;
+
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(4, "Brown"),
+                72,
+                176
+        );
+        opponentEntity.setUser(userEntity);
+        opponentEntity.setId(opponentId);
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
+
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentController = new OpponentController(opponentManager);
+        ResponseEntity responseEntity = opponentController.deleteOpponent(opponentId);
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void deleteOpponentShouldReturn404IfOpponentNotFound() {
+        User userEntity = new User();
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+
+        long opponentId = 1L;
+
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentController = new OpponentController(opponentManager);
+        ResponseEntity responseEntity = opponentController.deleteOpponent(opponentId);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
+
     private void assertOpponentFields(com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity, com.David.JiuJitsuJournal.api.responses.Opponent opponentDto) {
         assertEquals(Optional.of(opponentEntity.getId()).get(), opponentDto.getId());
         assertEquals(opponentEntity.getName(), opponentDto.getName());
