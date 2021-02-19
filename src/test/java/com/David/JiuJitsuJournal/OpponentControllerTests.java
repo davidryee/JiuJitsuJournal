@@ -34,7 +34,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class OpponentControllerTest {
+public class OpponentControllerTests {
     @InjectMocks
     private OpponentController opponentController;
     private OpponentManager opponentManager;
