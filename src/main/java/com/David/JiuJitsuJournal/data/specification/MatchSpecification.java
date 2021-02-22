@@ -4,24 +4,26 @@ import com.David.JiuJitsuJournal.data.entities.Match;
 import com.David.JiuJitsuJournal.data.entities.Opponent;
 import com.David.JiuJitsuJournal.data.entities.User;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Component
 public class MatchSpecification {
-    public static Specification<Match> withUser(User user) {
+    public Specification<Match> withUser(User user) {
         return (root, query, cb) -> user == null ? null : cb.equal(root.get("user"), user);
     }
 
-    public static Specification<Match> withDate(LocalDate date) {
+    public Specification<Match> withDate(LocalDate date) {
         return ((root, query, cb) -> date == null ? null : cb.equal(root.get("matchDate"), date));
     }
 
-    public static Specification<Match> withOpponents(List<Opponent> opponents) {
+    public Specification<Match> withOpponents(List<Opponent> opponents) {
         return ((root, query, cb) -> opponents == null ? null : cb.isTrue(root.get("opponent").in(opponents)));
     }
 
-    public static Specification<Match> withId(Long id) {
+    public Specification<Match> withId(Long id) {
         return ((root, query, cb) -> id == null ? null : cb.equal(root.get("id"), id));
     }
 }

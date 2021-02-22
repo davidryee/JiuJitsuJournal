@@ -21,18 +21,21 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
 
     OpponentRepository opponentRepository;
     UserRepository userRepository;
-    public OpponentDataService(OpponentRepository opponentRepository, UserRepository userRepository){
+    OpponentSpecification opponentSpecification;
+    public OpponentDataService(OpponentRepository opponentRepository, UserRepository userRepository,
+                               OpponentSpecification opponentSpecification){
         this.opponentRepository = opponentRepository;
         this.userRepository = userRepository;
+        this.opponentSpecification = opponentSpecification;
     }
     @Override
     public List<Opponent> getAllOpponents(String name, Integer beltRank, String username) {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
-                                                                                OpponentSpecification.withName(name))
-                                                                                .and(OpponentSpecification.
+                                                                                opponentSpecification.withName(name))
+                                                                                .and(opponentSpecification.
                                                                                         withBeltRank(beltRank))
-                                                                                .and(OpponentSpecification.withUser(user));
+                                                                                .and(opponentSpecification.withUser(user));
         List<Opponent> opponents = new LinkedList();
         List<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntities = this.opponentRepository.findAll(spec);
 
@@ -46,8 +49,8 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
     public Opponent getOpponentById(Long id, String username) {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
-                                                                                OpponentSpecification.withId(id))
-                                                                                .and(OpponentSpecification.withUser(user));
+                                                                                opponentSpecification.withId(id))
+                                                                                .and(opponentSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentEntity = this.opponentRepository.findOne(spec);
 
         if(opponentEntity.isEmpty()){
@@ -77,8 +80,8 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
             throws Exception {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
-                OpponentSpecification.withId(id))
-                .and(OpponentSpecification.withUser(user));
+                opponentSpecification.withId(id))
+                .and(opponentSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToUpdate = this.opponentRepository.findOne(spec);
 
         if(opponentToUpdate.isEmpty()){
@@ -103,8 +106,8 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
     public void deleteOpponent(Long id, String username) {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Opponent> spec = Specification.where(
-                OpponentSpecification.withId(id))
-                .and(OpponentSpecification.withUser(user));
+                opponentSpecification.withId(id))
+                .and(opponentSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Opponent> opponentToDelete = this.opponentRepository.findOne(spec);
 
         if(opponentToDelete.isEmpty()) {
