@@ -42,7 +42,7 @@ public class MatchController {
 
     @GetMapping("/matches")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public Iterable<com.David.JiuJitsuJournal.api.responses.Match> getMatches(@RequestParam(required = false) String opponentName,
+    public ResponseEntity getMatches(@RequestParam(required = false) String opponentName,
                                                                               @RequestParam(required = false) Integer opponentBeltRank,
                                                                               @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate matchDate) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
@@ -53,7 +53,7 @@ public class MatchController {
             matchDtos.add(MatchMapper.mapToDto(matchModel));
         }
 
-        return matchDtos;
+        return new ResponseEntity(matchDtos, HttpStatus.OK);
     }
 
     @PostMapping("/matches")
