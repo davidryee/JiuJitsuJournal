@@ -7,6 +7,7 @@ import com.David.JiuJitsuJournal.data.entities.BeltRank;
 import com.David.JiuJitsuJournal.data.entities.User;
 import com.David.JiuJitsuJournal.data.repository.OpponentRepository;
 import com.David.JiuJitsuJournal.data.repository.UserRepository;
+import com.David.JiuJitsuJournal.data.specification.OpponentSpecification;
 import com.David.JiuJitsuJournal.domain.BeltRankEnum;
 import com.David.JiuJitsuJournal.domain.managers.OpponentManager;
 import org.junit.Before;
@@ -30,8 +31,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class OpponentControllerTests {
@@ -43,6 +43,8 @@ public class OpponentControllerTests {
     private OpponentRepository opponentRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private OpponentSpecification opponentSpecification;
 
     @Before
     public void init() {
@@ -76,12 +78,15 @@ public class OpponentControllerTests {
         opponentEntity.setId(opponentId);
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
 
         ResponseEntity responseEntity = opponentController.getOpponent(opponentId);
         com.David.JiuJitsuJournal.api.responses.Opponent opponentDto = (com.David.JiuJitsuJournal.api.responses.Opponent) responseEntity.getBody();
 
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertOpponentFields(opponentEntity, opponentDto);
     }
@@ -94,12 +99,14 @@ public class OpponentControllerTests {
 
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
 
         ResponseEntity responseEntity = opponentController.getOpponent(opponentId);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
     }
 
     @Test
@@ -143,14 +150,74 @@ public class OpponentControllerTests {
                 opponentEntity3
         )));
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.getOpponents(null, null);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(opponentSpecification).withName(null);
+        verify(opponentSpecification).withBeltRank(null);
+        verify(opponentSpecification).withUser(userEntity);
+
         LinkedList<Opponent> body = (LinkedList<Opponent>) responseEntity.getBody();
         assertOpponentFields(opponentEntity1, body.get(0));
         assertOpponentFields(opponentEntity2, body.get(1));
         assertOpponentFields(opponentEntity3, body.get(2));
+    }
+
+    @Test
+    public void getOpponentsWithSearchParamsShouldReturnOpponentsIfTheyExist() {
+        User userEntity = new User();
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+
+        long opponent1Id = 1L;
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity1 = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(3, "Brown"),
+                72,
+                176
+        );
+        opponentEntity1.setId(opponent1Id);
+        opponentEntity1.setUser(userEntity);
+
+        long opponent2Id = 2L;
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity2 = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Bob Grappler",
+                new BeltRank(2, "Purple"),
+                66,
+                200
+        );
+        opponentEntity2.setId(opponent2Id);
+        opponentEntity2.setUser(userEntity);
+
+        long opponent3Id = 3L;
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity3 = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Jane Smith",
+                new BeltRank(4, "Black"),
+                68,
+                150
+        );
+        opponentEntity3.setId(opponent3Id);
+        opponentEntity3.setUser(userEntity);
+
+        when(opponentRepository.findAll(any(Specification.class))).thenReturn(new LinkedList(Arrays.asList(
+                opponentEntity1,
+                opponentEntity2,
+                opponentEntity3
+        )));
+
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
+        opponentController = new OpponentController(opponentManager);
+        ResponseEntity responseEntity = opponentController.getOpponents(opponentEntity1.getName(),
+                opponentEntity1.getBeltRank().getBeltRankId());
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(opponentSpecification).withName(opponentEntity1.getName());
+        verify(opponentSpecification).withBeltRank(opponentEntity1.getBeltRank().getBeltRankId());
+        verify(opponentSpecification).withUser(userEntity);
+
+        LinkedList<Opponent> body = (LinkedList<Opponent>) responseEntity.getBody();
+        assertOpponentFields(opponentEntity1, body.get(0));
     }
 
     @Test
@@ -159,11 +226,15 @@ public class OpponentControllerTests {
         when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
         when(opponentRepository.findAll(any(Specification.class))).thenReturn(new LinkedList());
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.getOpponents(null, null);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
+        verify(opponentSpecification).withName(null);
+        verify(opponentSpecification).withBeltRank(null);
+        verify(opponentSpecification).withUser(userEntity);
         LinkedList<Opponent> body = (LinkedList<Opponent>) responseEntity.getBody();
         assertEquals(0, body.size());
     }
@@ -182,7 +253,8 @@ public class OpponentControllerTests {
         );
         opponentEntity.setId(1L);
         when(opponentRepository.save(any())).thenReturn(opponentEntity);
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.createOpponent(request);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -200,7 +272,8 @@ public class OpponentControllerTests {
         User userEntity = new User();
         when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
         when(opponentRepository.save(any())).thenReturn(null);
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.createOpponent(request);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
@@ -224,10 +297,14 @@ public class OpponentControllerTests {
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
         when(opponentRepository.save(opponentEntity)).thenReturn(opponentEntity);
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.updateOpponent(request, opponentId);
         Opponent opponentDto = (Opponent) responseEntity.getBody();
+
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(request.getWeightInLbs(), opponentDto.getWeightInLbs());
         assertEquals(request.getName(), opponentDto.getName());
@@ -245,9 +322,13 @@ public class OpponentControllerTests {
 
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.updateOpponent(request, opponentId);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
+
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertEquals(String.format("Opponent with id %d does not exist", opponentId), responseEntity.getBody());
     }
@@ -268,9 +349,12 @@ public class OpponentControllerTests {
         when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
         when(opponentRepository.save(any())).thenReturn(null);
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.updateOpponent(request, opponentId);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
 
@@ -291,9 +375,12 @@ public class OpponentControllerTests {
         opponentEntity.setId(opponentId);
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
 
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.deleteOpponent(opponentId);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
     }
 
@@ -305,9 +392,12 @@ public class OpponentControllerTests {
         long opponentId = 1L;
 
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
-        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(opponentRepository, userRepository));
+        opponentManager = new OpponentManager(new com.David.JiuJitsuJournal.data.services.OpponentDataService(
+                opponentRepository, userRepository, opponentSpecification));
         opponentController = new OpponentController(opponentManager);
         ResponseEntity responseEntity = opponentController.deleteOpponent(opponentId);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 

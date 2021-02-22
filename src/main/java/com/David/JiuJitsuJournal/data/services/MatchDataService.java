@@ -24,19 +24,24 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
     UserRepository userRepository;
     OpponentRepository opponentRepository;
     MatchRepository matchRepository;
+    OpponentSpecification opponentSpecification;
+    MatchSpecification matchSpecification;
 
     public MatchDataService(UserRepository userRepository, OpponentRepository opponentRepository,
-                            MatchRepository matchRepository){
+                            MatchRepository matchRepository, OpponentSpecification opponentSpecification,
+                            MatchSpecification matchSpecification){
         this.userRepository = userRepository;
         this.opponentRepository = opponentRepository;
         this.matchRepository = matchRepository;
+        this.opponentSpecification = opponentSpecification;
+        this.matchSpecification = matchSpecification;
     }
     @Override
     public Match createMatch(LocalDate matchDate, Long opponentId, String description, String username) throws Exception {
         User userEntity = userRepository.findByUsername(username).get();
         Specification<Opponent> opponentSpec = Specification.where(
-                OpponentSpecification.withId(opponentId))
-                .and(OpponentSpecification.withUser(userEntity));
+                opponentSpecification.withId(opponentId))
+                .and(opponentSpecification.withUser(userEntity));
         Optional<Opponent> opponentEntity = this.opponentRepository.findOne(opponentSpec);
 
         if(opponentEntity.isEmpty()) {
@@ -58,21 +63,21 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
         User user = this.userRepository.findByUsername(username).get();
         List<Opponent> opponents;
         Specification<com.David.JiuJitsuJournal.data.entities.Match> matchWithNoOpponentSpec = Specification.where(
-                MatchSpecification.withDate(matchDate)).and(MatchSpecification.withUser(user));
+                matchSpecification.withDate(matchDate)).and(matchSpecification.withUser(user));
         List<com.David.JiuJitsuJournal.data.entities.Match> matchEntities;
         //separate case because if a user is searching for an opponent and it comes back null, we dont want to search
         //a match that has a null opponent
         if(opponentName != null || beltRank != null) {
-            Specification<Opponent> opponentSpec = Specification.where(OpponentSpecification.withName(opponentName))
-                    .and(OpponentSpecification.withBeltRank(beltRank))
-                    .and(OpponentSpecification.withUser(user));
+            Specification<Opponent> opponentSpec = Specification.where(opponentSpecification.withName(opponentName))
+                    .and(opponentSpecification.withBeltRank(beltRank))
+                    .and(opponentSpecification.withUser(user));
             opponents = this.opponentRepository.findAll(opponentSpec);
             if(opponents.isEmpty()){
                 return Collections.emptyList();
             }
             else {
                 Specification<com.David.JiuJitsuJournal.data.entities.Match> matchWithOpponentSpec = matchWithNoOpponentSpec
-                        .and(MatchSpecification.withOpponents(opponents));
+                        .and(matchSpecification.withOpponents(opponents));
                 matchEntities = this.matchRepository.findAll(matchWithOpponentSpec);
             }
         }
@@ -92,8 +97,8 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
     public Match getMatchById(Long id, String username) {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(
-                                                                            MatchSpecification.withId(id))
-                                                                            .and(MatchSpecification.withUser(user));
+                                                                            matchSpecification.withId(id))
+                                                                            .and(matchSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Match> matchEntity = this.matchRepository.findOne(spec);
         if(matchEntity.isEmpty()){
             return null;
@@ -108,16 +113,16 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
         User user = this.userRepository.findByUsername(username).get();
 
         Specification<Opponent> opponentSpec = Specification.where(
-                OpponentSpecification.withId(opponentId))
-                .and(OpponentSpecification.withUser(user));
+                opponentSpecification.withId(opponentId))
+                .and(opponentSpecification.withUser(user));
         Optional<Opponent> opponentEntity = this.opponentRepository.findOne(opponentSpec);
 
         if(opponentEntity.isEmpty()){
             throw new EntityNotFoundException(String.format("Opponent with id %d not found.", opponentId));
         }
 
-        Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(MatchSpecification.withId(id))
-                                                                            .and(MatchSpecification.withUser(user));
+        Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(matchSpecification.withId(id))
+                                                                            .and(matchSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Match> matchToUpdate = this.matchRepository.findOne(spec);
 
         if(matchToUpdate.isEmpty()){
@@ -139,8 +144,8 @@ public class MatchDataService implements com.David.JiuJitsuJournal.domain.dataSe
     public void deleteMatch(Long id, String username) {
         User user = this.userRepository.findByUsername(username).get();
         Specification<com.David.JiuJitsuJournal.data.entities.Match> spec = Specification.where(
-                MatchSpecification.withId(id))
-                .and(MatchSpecification.withUser(user));
+                matchSpecification.withId(id))
+                .and(matchSpecification.withUser(user));
         Optional<com.David.JiuJitsuJournal.data.entities.Match> matchToDelete = this.matchRepository.findOne(spec);
 
         if(matchToDelete.isEmpty()){

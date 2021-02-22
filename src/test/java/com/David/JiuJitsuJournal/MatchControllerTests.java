@@ -9,6 +9,8 @@ import com.David.JiuJitsuJournal.data.repository.MatchRepository;
 import com.David.JiuJitsuJournal.data.repository.OpponentRepository;
 import com.David.JiuJitsuJournal.data.repository.UserRepository;
 import com.David.JiuJitsuJournal.data.services.MatchDataService;
+import com.David.JiuJitsuJournal.data.specification.MatchSpecification;
+import com.David.JiuJitsuJournal.data.specification.OpponentSpecification;
 import com.David.JiuJitsuJournal.domain.managers.MatchManager;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,9 +34,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class MatchControllerTests {
@@ -48,6 +49,10 @@ public class MatchControllerTests {
     private OpponentRepository opponentRepository;
     @Mock
     UserRepository userRepository;
+    @Mock
+    OpponentSpecification opponentSpecification;
+    @Mock
+    MatchSpecification matchSpecification;
 
     @Before
     public void init() {
@@ -86,10 +91,13 @@ public class MatchControllerTests {
 
         when(matchRepository.findOne(any(Specification.class))).thenReturn(Optional.of(matchEntity));
 
-        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository));
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
         matchController = new MatchController(matchManager);
 
         ResponseEntity responseEntity = matchController.getMatch(matchId);
+        verify(matchSpecification).withId(matchId);
+        verify(matchSpecification).withUser(userEntity);
         com.David.JiuJitsuJournal.api.responses.Match matchDto = (com.David.JiuJitsuJournal.api.responses.Match) responseEntity.getBody();
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertMatchValues(matchEntity, matchDto);
@@ -103,10 +111,13 @@ public class MatchControllerTests {
         long matchId = 2L;
 
         when(matchRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
-        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository));
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
         matchController = new MatchController(matchManager);
 
         ResponseEntity responseEntity = matchController.getMatch(matchId);
+        verify(matchSpecification).withId(matchId);
+        verify(matchSpecification).withUser(userEntity);
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
@@ -146,10 +157,13 @@ public class MatchControllerTests {
         List<Match> matchEntitiesFound = new LinkedList<>(Arrays.asList(match1Entity, match2Entity));
         when(matchRepository.findAll(any(Specification.class))).thenReturn(matchEntitiesFound);
 
-        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository));
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
         matchController = new MatchController(matchManager);
         ResponseEntity responseEntity = matchController.getMatches(null, null, null);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(matchSpecification).withDate(null);
+        verify(matchSpecification).withUser(userEntity);
         LinkedList<com.David.JiuJitsuJournal.api.responses.Match> body = (LinkedList<com.David.JiuJitsuJournal.api.responses.Match>) responseEntity.getBody();
         assertMatchValues(match1Entity, body.get(0));
         assertMatchValues(match2Entity, body.get(1));
@@ -194,10 +208,18 @@ public class MatchControllerTests {
         List<Match> matchEntitiesFound = new LinkedList<>(Arrays.asList(match1Entity));
         when(matchRepository.findAll(any(Specification.class))).thenReturn(matchEntitiesFound);
 
-        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository));
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
         matchController = new MatchController(matchManager);
-        ResponseEntity responseEntity = matchController.getMatches(opponent1Entity.getName(), null, null);
+        ResponseEntity responseEntity = matchController.getMatches(opponent1Entity.getName(),
+                opponent1Entity.getBeltRank().getBeltRankId(), match1Entity.getMatchDate());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(opponentSpecification).withName(opponent1Entity.getName());
+        verify(opponentSpecification).withBeltRank(opponent1Entity.getBeltRank().getBeltRankId());
+        verify(opponentSpecification).withUser(userEntity);
+        verify(matchSpecification).withDate(match1Entity.getMatchDate());
+        verify(matchSpecification).withUser(userEntity);
+        verify(matchSpecification).withOpponents(Arrays.asList(opponent1Entity));
         LinkedList<com.David.JiuJitsuJournal.api.responses.Match> body = (LinkedList<com.David.JiuJitsuJournal.api.responses.Match>) responseEntity.getBody();
         assertMatchValues(match1Entity, body.get(0));
     }
@@ -209,10 +231,15 @@ public class MatchControllerTests {
         when(opponentRepository.findAll(any(Specification.class))).thenReturn(new LinkedList());
         when(matchRepository.findAll(any(Specification.class))).thenReturn(new LinkedList());
 
-        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository));
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
         matchController = new MatchController(matchManager);
-        ResponseEntity responseEntity = matchController.getMatches(null, null, null);
+        LocalDate matchDate = LocalDate.of(2021, 2, 2);
+        ResponseEntity responseEntity = matchController.getMatches("Bob", 2,
+                matchDate);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        verify(matchSpecification).withUser(userEntity);
+        verify(matchSpecification).withDate(matchDate);
         LinkedList<com.David.JiuJitsuJournal.api.responses.Match> body = (LinkedList<com.David.JiuJitsuJournal.api.responses.Match>) responseEntity.getBody();
 
         assertEquals(0, body.size());
