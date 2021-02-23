@@ -1,6 +1,7 @@
 package com.David.JiuJitsuJournal;
 
 import com.David.JiuJitsuJournal.api.controllers.MatchController;
+import com.David.JiuJitsuJournal.api.requests.MatchRequest;
 import com.David.JiuJitsuJournal.data.entities.BeltRank;
 import com.David.JiuJitsuJournal.data.entities.Match;
 import com.David.JiuJitsuJournal.data.entities.Opponent;
@@ -243,6 +244,91 @@ public class MatchControllerTests {
         LinkedList<com.David.JiuJitsuJournal.api.responses.Match> body = (LinkedList<com.David.JiuJitsuJournal.api.responses.Match>) responseEntity.getBody();
 
         assertEquals(0, body.size());
+    }
+
+    @Test
+    public void createMatchShouldReturnMatchWithProperMapping() {
+        long opponentId = 1L;
+        LocalDate matchDate = LocalDate.of(2021, 2, 20);
+        MatchRequest matchRequest = new MatchRequest(matchDate, opponentId,
+                "Lots of reversals");
+
+        User userEntity = new User();
+
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(4, "Brown"),
+                72,
+                176
+        );
+        opponentEntity.setUser(userEntity);
+        opponentEntity.setId(opponentId);
+
+        Match matchEntity = new Match(matchRequest.getMatchDate(), userEntity, opponentEntity,
+                matchRequest.getDescription());
+
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
+        when(matchRepository.save(any(Match.class))).thenReturn(matchEntity);
+
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
+        matchController = new MatchController(matchManager);
+        ResponseEntity responseEntity = matchController.createMatch(matchRequest);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertMatchValues(matchEntity, (com.David.JiuJitsuJournal.api.responses.Match) responseEntity.getBody());
+    }
+
+    @Test
+    public void createMatchDoesNotFindOpponentReturns404() {
+        long opponentId = 1L;
+        LocalDate matchDate = LocalDate.of(2021, 2, 20);
+        MatchRequest matchRequest = new MatchRequest(matchDate, opponentId,
+                "Lots of reversals");
+
+        User userEntity = new User();
+
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
+        matchController = new MatchController(matchManager);
+        ResponseEntity responseEntity = matchController.createMatch(matchRequest);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertEquals(String.format("Opponent with id %d not found.", opponentId), responseEntity.getBody());
+    }
+
+    @Test
+    public void createMatchShouldReturn500IfNotSavedToDatabase() {
+        long opponentId = 1L;
+        LocalDate matchDate = LocalDate.of(2021, 2, 20);
+        MatchRequest matchRequest = new MatchRequest(matchDate, opponentId,
+                "Lots of reversals");
+
+        User userEntity = new User();
+
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(4, "Brown"),
+                72,
+                176
+        );
+        opponentEntity.setUser(userEntity);
+        opponentEntity.setId(opponentId);
+
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
+        when(matchRepository.save(any(Match.class))).thenReturn(null);
+
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
+        matchController = new MatchController(matchManager);
+        ResponseEntity responseEntity = matchController.createMatch(matchRequest);
+        verify(opponentSpecification).withId(opponentId);
+        verify(opponentSpecification).withUser(userEntity);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
     }
 
     private void assertMatchValues(Match matchEntity, com.David.JiuJitsuJournal.api.responses.Match matchDto) {
