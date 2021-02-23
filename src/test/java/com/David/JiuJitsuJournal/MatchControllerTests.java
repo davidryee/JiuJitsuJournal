@@ -459,9 +459,6 @@ public class MatchControllerTests {
         Match originalMatchEntity = new Match(LocalDate.of(2021, 2, 2), userEntity, opponentEntity,
                 "Good fight");
 
-        Match matchEntity = new Match(matchRequest.getMatchDate(), userEntity, opponentEntity,
-                matchRequest.getDescription());
-
         when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
         when(opponentRepository.findOne(any(Specification.class))).thenReturn(Optional.of(opponentEntity));
         when(matchRepository.findOne(any(Specification.class))).thenReturn(Optional.of(originalMatchEntity));
@@ -476,6 +473,63 @@ public class MatchControllerTests {
         verify(matchSpecification).withId(matchId);
         verify(matchSpecification).withUser(userEntity);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void deleteMatchShouldReturn204NoContent() {
+        long matchId = 1L;
+        long opponentId = 1L;
+        User userEntity = new User();
+
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(4, "Brown"),
+                72,
+                176
+        );
+        opponentEntity.setUser(userEntity);
+        opponentEntity.setId(opponentId);
+        Match originalMatchEntity = new Match(LocalDate.of(2021, 2, 2), userEntity, opponentEntity,
+                "Good fight");
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        when(matchRepository.findOne(any(Specification.class))).thenReturn(Optional.of(originalMatchEntity));
+
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
+        matchController = new MatchController(matchManager);
+        ResponseEntity responseEntity = matchController.deleteMatch(matchId);
+        verify(matchSpecification).withId(matchId);
+        verify(matchSpecification).withUser(userEntity);
+        verify(matchRepository).delete(originalMatchEntity);
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void deleteMatchCantFindMatchShouldReturn404() {
+        long matchId = 1L;
+        long opponentId = 1L;
+        User userEntity = new User();
+
+        com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity = new com.David.JiuJitsuJournal.data.entities.Opponent(
+                "Royce Gracie",
+                new BeltRank(4, "Brown"),
+                72,
+                176
+        );
+        opponentEntity.setUser(userEntity);
+        opponentEntity.setId(opponentId);
+        Match originalMatchEntity = new Match(LocalDate.of(2021, 2, 2), userEntity, opponentEntity,
+                "Good fight");
+        when(userRepository.findByUsername(null)).thenReturn(java.util.Optional.of(userEntity));
+        when(matchRepository.findOne(any(Specification.class))).thenReturn(Optional.empty());
+
+        matchManager = new MatchManager(new MatchDataService(userRepository, opponentRepository, matchRepository,
+                opponentSpecification, matchSpecification));
+        matchController = new MatchController(matchManager);
+        ResponseEntity responseEntity = matchController.deleteMatch(matchId);
+        verify(matchSpecification).withId(matchId);
+        verify(matchSpecification).withUser(userEntity);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
 
     private void assertMatchValues(Match matchEntity, com.David.JiuJitsuJournal.api.responses.Match matchDto) {
