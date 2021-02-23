@@ -79,7 +79,7 @@ public class MatchController {
     @PutMapping("/matches/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity updateMatch(@Valid @RequestBody MatchRequest matchRequest,
-                                      @PathVariable("id") Long id) throws Exception {
+                                      @PathVariable("id") Long id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         try {
@@ -92,6 +92,9 @@ public class MatchController {
         }
         catch (EntityNotFoundException ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+        catch (Exception e){
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
