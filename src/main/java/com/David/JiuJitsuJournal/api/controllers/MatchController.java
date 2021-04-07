@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class MatchController {
     private MatchManager matchManager;
 
