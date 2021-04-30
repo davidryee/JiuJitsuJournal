@@ -64,7 +64,7 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
     @Override
     public Opponent createOpponent(String name, BeltRankEnum beltRank, int heightInInches, int weightInLbs, String username)
             throws Exception {
-        BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+        BeltRank beltRankToPersist = new BeltRank(beltRank.getBeltRankId(), beltRank.name());
         User userEntity = userRepository.findByUsername(username).get();
         com.David.JiuJitsuJournal.data.entities.Opponent opponentToSave = new com.David.JiuJitsuJournal.data.entities.Opponent(name, beltRankToPersist, heightInInches, weightInLbs);
         opponentToSave.setUser(userEntity);
@@ -88,7 +88,7 @@ public class OpponentDataService implements com.David.JiuJitsuJournal.domain.dat
             throw new EntityNotFoundException(String.format("Opponent with id %d does not exist", id));
         }
 
-        BeltRank beltRankToPersist = new BeltRank(beltRank.ordinal(), beltRank.name());
+        BeltRank beltRankToPersist = new BeltRank(beltRank.getBeltRankId(), beltRank.name());
 
         com.David.JiuJitsuJournal.data.entities.Opponent retrievedOpponent = opponentToUpdate.get();
         retrievedOpponent.setName(name);

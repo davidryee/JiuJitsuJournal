@@ -7,7 +7,7 @@ public class OpponentMapper {
     public static Opponent mapEntityToDomain(com.David.JiuJitsuJournal.data.entities.Opponent opponentEntity){
         return new Opponent(
                 opponentEntity.getName(),
-                BeltRankEnum.values()[opponentEntity.getBeltRank().getBeltRankId()],
+                BeltRankEnum.getByBeltRankId(opponentEntity.getBeltRank().getBeltRankId()),
                 opponentEntity.getHeightInInches(),
                 opponentEntity.getWeightInLbs(),
                 opponentEntity.getId());
