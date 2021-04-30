@@ -5,6 +5,7 @@ import com.David.JiuJitsuJournal.domain.dataServices.OpponentDataService;
 import com.David.JiuJitsuJournal.domain.models.Opponent;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -24,11 +25,11 @@ public class OpponentManager {
     }
 
     public Opponent createOpponent(String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
-        return this.opponentDataService.createOpponent(name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
+        return this.opponentDataService.createOpponent(name, BeltRankEnum.getByBeltRankId(beltRank), heightInches, weightInLbs, username);
     }
 
     public Opponent updateOpponent(Long id, String name, int beltRank, int heightInches, int weightInLbs, String username) throws Exception {
-        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.values()[beltRank], heightInches, weightInLbs, username);
+        return this.opponentDataService.updateOpponent(id, name, BeltRankEnum.getByBeltRankId(beltRank), heightInches, weightInLbs, username);
     }
 
     public void deleteOpponent(Long id, String username) {
