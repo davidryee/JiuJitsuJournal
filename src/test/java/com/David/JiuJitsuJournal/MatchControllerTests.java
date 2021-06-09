@@ -536,6 +536,6 @@ public class MatchControllerTests {
         assertEquals(Optional.of(matchEntity.getId()).get(), matchDto.getId());
         assertEquals(matchEntity.getMatchDate(), matchDto.getMatchDate());
         assertEquals(matchEntity.getDescription(), matchDto.getDescription());
-        assertEquals(Optional.of(matchEntity.getOpponent().getId()).get(), matchDto.getOpponentId());
+        assertEquals(Optional.of(matchEntity.getOpponent().getId()).get(), matchDto.getOpponent().getId());
     }
 }

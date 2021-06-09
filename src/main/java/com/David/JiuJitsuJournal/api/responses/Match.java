@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class Match {
     private Long id;
     private LocalDate matchDate;
-    private Long opponentId;
+    private Opponent opponent;
     private String description;
 
     public Long getId() {
@@ -24,14 +24,6 @@ public class Match {
         this.matchDate = matchDate;
     }
 
-    public Long getOpponentId() {
-        return opponentId;
-    }
-
-    public void setOpponentId(Long opponentId) {
-        this.opponentId = opponentId;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -39,4 +31,8 @@ public class Match {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public Opponent getOpponent() { return opponent; }
+
+    public void setOpponent(Opponent opponent) { this.opponent = opponent; }
 }
