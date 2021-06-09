@@ -7,7 +7,7 @@ public class MatchMapper {
         com.David.JiuJitsuJournal.api.responses.Match matchDto = new com.David.JiuJitsuJournal.api.responses.Match();
         matchDto.setMatchDate(matchModel.getMatchDate());
         matchDto.setId(matchModel.getId());
-        matchDto.setOpponentId(matchModel.getOpponent().getId());
+        matchDto.setOpponent(OpponentMapper.mapToDto(matchModel.getOpponent()));
         matchDto.setDescription(matchModel.getDescription());
 
         return matchDto;
